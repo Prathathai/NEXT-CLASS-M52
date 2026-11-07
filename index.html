@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#123d2b">
+<title>NEXT CLASS | M.5/2</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f3f6f3;
+  color: #183c2b;
+}
+
+header {
+  background: #123d2b;
+  color: white;
+  padding: 28px 22px 35px;
+  border-radius: 0 0 25px 25px;
+}
+
+header small {
+  color: #c4dfcc;
+}
+
+header h1 {
+  font-size: 29px;
+  margin: 12px 0 5px;
+}
+
+.container {
+  padding: 20px;
+  max-width: 650px;
+  margin: auto;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 3px 15px #163d2b0c;
+}
+
+.label {
+  font-size: 13px;
+  color: #718477;
+}
+
+.time {
+  font-size: 30px;
+  font-weight: bold;
+  margin: 12px 0;
+}
+
+.subject {
+  font-size: 23px;
+  font-weight: bold;
+  margin: 8px 0;
+}
+
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 13px 17px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.primary {
+  background: #17643e;
+  color: white;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.secondary {
+  background: #e9f2eb;
+  color: #17643e;
+}
+
+.period {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #edf0ed;
+  gap: 10px;
+}
+
+.period:last-child {
+  border-bottom: none;
+}
+
+.period strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.period small {
+  color: #718477;
+}
+
+.status {
+  background: #e9f2eb;
+  color: #17643e;
+  padding: 7px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+select {
+  padding: 12px;
+  border: 1px solid #dce6dd;
+  border-radius: 10px;
+  width: 100%;
+  background: white;
+  font-size: 15px;
+}
+
+footer {
+  text-align: center;
+  color: #819187;
+  font-size: 12px;
+  padding: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <small>SCHOOL HUB • M.5/2</small>
+  <h1>NEXT CLASS 🔔</h1>
+  <div>ระบบตารางเรียนและแจ้งเตือนอัตโนมัติ</div>
+</header>
+
+<main class="container">
+
+  <section class="card">
+    <div class="label">วันเรียน</div>
+    <select id="day" onchange="showSchedule()">
+      <option value="1">วันจันทร์</option>
+      <option value="2">วันอังคาร</option>
+      <option value="3">วันพุธ</option>
+      <option value="4">วันพฤหัสบดี</option>
+      <option value="5">วันศุกร์</option>
+    </select>
+  </section>
+
+  <section class="card">
+    <div class="label">ตารางเรียนของวันนี้</div>
+    <div class="subject" id="today">วันจันทร์</div>
+    <div class="label">NEXT CLASS SYSTEM</div>
+  </section>
+
+  <section class="card">
+    <div class="label">🔔 การแจ้งเตือน</div>
+    <div class="subject">แจ้งก่อนเรียน 10 นาที</div>
+    <p class="label" id="notifyStatus">
+      ยังไม่ได้เชื่อมต่อระบบแจ้งเตือน
+    </p>
+    <button class="primary" onclick="setupNotice()">
+      เปิดการแจ้งเตือน
+    </button>
+  </section>
+
+  <section class="card">
+    <div class="label">ตารางคาบเรียน</div>
+    <div id="schedule"></div>
+  </section>
+
+</main>
+
+<footer>
+  NEXT CLASS © 2026<br>
+  SCHOOL HUB M.5/2
+</footer>
+
+<script>
+const periods = [
+  ["คาบ 0","07:30 - 08:30"],
+  ["คาบ 1","08:30 - 09:25"],
+  ["คาบ 2","09:25 - 10:20"],
+  ["คาบ 3","10:20 - 11:15"],
+  ["คาบ 4","11:15 - 12:10"],
+  ["คาบ 5","12:10 - 13:05"],
+  ["คาบ 6","13:05 - 14:00"],
+  ["คาบ 7","14:00 - 14:55"],
+  ["คาบ 8","14:55 - 15:50"]
+];
+
+function showSchedule() {
+  const day = document.getElementById("day");
+  const name = day.options[day.selectedIndex].text;
+
+  document.getElementById("today").textContent = name;
+
+  document.getElementById("schedule").innerHTML =
+    periods.map(p => `
+      <div class="period">
+        <div>
+          <strong>${p[0]}</strong>
+          <small>${p[1]}</small>
+        </div>
+        <span class="status">รอเพิ่มข้อมูล</span>
+      </div>
+    `).join("");
+}
+
+function setupNotice() {
+  const status = document.getElementById("notifyStatus");
+
+  if (!("Notification" in window)) {
+    status.textContent =
+      "อุปกรณ์นี้ไม่รองรับการแจ้งเตือนแบบนี้";
+    return;
+  }
+
+  Notification.requestPermission().then(permission => {
+    if (permission === "granted") {
+      status.textContent =
+        "อนุญาตการแจ้งเตือนแล้ว รอเชื่อมต่อระบบ Push";
+    } else {
+      status.textContent =
+        "ยังไม่ได้รับอนุญาตให้แจ้งเตือน";
+    }
+  });
+}
+
+showSchedule();
+</script>
+
+</body>
+</html>
